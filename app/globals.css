@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 300;
+  font-style: normal;
+}
+
+button{
+  font-family: 'Neue Metana';
+}
+
+h1,h2,h3,h4,h5{
+    font-family: 'Neue Metana';
+    font-weight: 700;
+}
+
+h2{
+    @apply text-3xl text-orange;
+}
