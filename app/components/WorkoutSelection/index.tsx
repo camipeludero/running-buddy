@@ -1,7 +1,6 @@
 'use client'
-import React, { useState } from "react";
-import { workouts } from "../../../../running-timer/src/workouts";
-import { Workout } from "../../types";
+import React from "react";
+import { workouts } from "@/app/utils/workouts";
 import Running from "../Running"; // Assuming Running is in the same folder
 import { BsBarChartFill } from "react-icons/bs";
 import { getLevel } from "../../utils";
