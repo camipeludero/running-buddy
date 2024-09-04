@@ -190,7 +190,7 @@ const Running: React.FC = () => {
               style={{ transition: "stroke-dashoffset 1s linear" }}
             />
           </svg>
-          <div className="absolute top-[41%] left-1/2 -translate-x-1/2 text-center">
+          <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 text-center">
             <h1 className="text-7xl">
               {Math.floor(timeLeft / 60)}:
               {(timeLeft % 60).toString().padStart(2, "0")}
