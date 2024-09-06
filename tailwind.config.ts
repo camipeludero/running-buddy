@@ -8,7 +8,11 @@ const config: Config = {
   ],
   theme: {
     extend: {
-       colors: {
+      fontFamily: {
+        "neue-metana": "var(--font-neue-metana",
+        "inter": "var(--font-inter)",
+      },
+      colors: {
         bg: "#F6F5E9",
         black: "#181613",
         orange: "#F58E12",

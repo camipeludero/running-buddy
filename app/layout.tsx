@@ -4,7 +4,7 @@ import { NeueMetana } from "../app/utils/customFonts"
 
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
 
 export const metadata: Metadata = {
   title: "Running Buddy",
@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`bg-bg text-black mx-auto ${inter.className} ${NeueMetana.className}`}>{children}</body>
+      <body className={`bg-bg text-black container ${inter.variable} ${NeueMetana.variable}`}>{children}</body>
     </html>
   );
 }

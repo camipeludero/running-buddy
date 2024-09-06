@@ -3,21 +3,27 @@
 @tailwind utilities;
 
 body {
-  font-family: "Inter", sans-serif;
-  font-optical-sizing: auto;
+  font-family: var(--font-inter);
   font-weight: 300;
-  font-style: normal;
 }
 
-button{
-  font-family: 'Neue Metana';
+h1,
+h2,
+h3,
+h4,
+h5,
+button {
+  font-family: var(--font-neue-metana);
 }
 
-h1,h2,h3,h4,h5{
-    font-family: 'Neue Metana';
-    font-weight: 700;
+h1,
+h2,
+h3,
+h4,
+h5{
+  @apply font-bold;
 }
 
-h2{
-    @apply text-3xl text-orange;
+h2 {
+  @apply text-3xl text-orange;
 }
