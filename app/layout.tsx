@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`bg-bg text-black mx-auto max-w-md ${inter.className} ${NeueMetana.variable}`}>{children}</body>
+      <body className={`bg-bg text-black mx-auto ${inter.className} ${NeueMetana.className}`}>{children}</body>
     </html>
   );
 }
