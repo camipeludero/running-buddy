@@ -198,7 +198,7 @@ const Running: React.FC = () => {
             />
           </svg>
           <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 text-center">
-            <h1 className="text-7xl">
+            <h1 className="text-5xl">
               {Math.floor(timeLeft / 60)}:
               {(timeLeft % 60).toString().padStart(2, "0")}
             </h1>
@@ -231,7 +231,7 @@ const Running: React.FC = () => {
       </div>
 
       {/* Buttons */}
-      <div className="flex items-center justify-center gap-8">
+      <div className="flex items-center justify-center gap-8 px-6">
         <button
           className="border border-black rounded-full w-10 h-10 flex items-center justify-center"
           onClick={stopTimer}
