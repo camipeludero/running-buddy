@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Workout, Set, Step } from "../../types";
+import {  Set, Step } from "../../types";
 import useSound from "use-sound";
 import { FaChevronLeft } from "react-icons/fa";
 import { useWorkoutStore } from "@/app/store/useWorkoutStore";
@@ -8,7 +8,6 @@ import { RiPauseLargeFill } from "react-icons/ri";
 import { IoMdPlay } from "react-icons/io";
 import { GrStopFill } from "react-icons/gr";
 import { MdOutlinePlaylistPlay } from "react-icons/md";
-import { Spotify } from "../Spotify";
 
 const Running: React.FC = () => {
   const { selectedWorkout, setSelectedWorkout } = useWorkoutStore();
