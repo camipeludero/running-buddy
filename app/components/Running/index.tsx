@@ -8,6 +8,7 @@ import { RiPauseLargeFill } from "react-icons/ri";
 import { IoMdPlay } from "react-icons/io";
 import { GrStopFill } from "react-icons/gr";
 import { MdOutlinePlaylistPlay } from "react-icons/md";
+import { Spotify } from "../Spotify";
 
 const Running: React.FC = () => {
   const { selectedWorkout, setSelectedWorkout } = useWorkoutStore();
@@ -17,23 +18,32 @@ const Running: React.FC = () => {
 
   const totalDuration = intervals.reduce((sum, step) => sum + step.duration, 0);
 
+  const [currentSet, setCurrentSet] = useState(0);
   const [currentInterval, setCurrentInterval] = useState(0);
   const [timeLeft, setTimeLeft] = useState(intervals[0].duration);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [play] = useSound("/sounds/alert.mp3");
 
-  // State to track total distance covered
   const [distanceCovered, setDistanceCovered] = useState(0);
 
-  // Calculate distance for the current interval
-  const calculateCurrentDistance = () => {
-    const currentStep = intervals[currentInterval];
-    const timeSpentInCurrentStep = currentStep.duration - timeLeft;
-    const distanceInCurrentStep =
-      currentStep.speed * (timeSpentInCurrentStep / 3600); // Convert seconds to hours
-    return distanceInCurrentStep;
-  };
+  useEffect(() => {
+    let cumulativeSteps = 0;
+    for (let i = 0; i < sets.length; i++) {
+      cumulativeSteps += sets[i].steps.length;
+      if (currentInterval < cumulativeSteps) {
+        setCurrentSet(i);
+        break;
+      }
+    }
+  }, [currentInterval, sets]);
+
+  useEffect(() => {
+    setDistanceCovered(
+      intervals[currentInterval].speed *
+        ((intervals[currentInterval].duration - timeLeft) / 3600)
+    );
+  }, [timeLeft]);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -49,10 +59,6 @@ const Running: React.FC = () => {
 
         if (prevTime <= 1) {
           play();
-          // Update distance covered with the distance of the completed interval
-          setDistanceCovered(
-            (prevDistance) => prevDistance + calculateCurrentDistance()
-          );
 
           const nextInterval = currentInterval + 1;
           setCurrentInterval(nextInterval);
@@ -62,12 +68,6 @@ const Running: React.FC = () => {
       });
 
       setElapsedTime((prevTime) => prevTime + 1);
-
-      // Update distance covered as time progresses in the current step
-      setDistanceCovered((prevDistance) => {
-        const currentDistance = calculateCurrentDistance();
-        return prevDistance + currentDistance;
-      });
     }, 1000);
 
     return () => clearInterval(timer);
@@ -83,6 +83,7 @@ const Running: React.FC = () => {
     setTimeLeft(intervals[0].duration);
     setElapsedTime(0);
     setDistanceCovered(0);
+    setCurrentSet(0);
   };
 
   const prevInterval = () => {
@@ -119,12 +120,19 @@ const Running: React.FC = () => {
   const strokeDashoffset =
     circumference - (stepProgressPercentage / 100) * circumference;
 
-  const totalMinutesCompleted = (elapsedTime / 60).toFixed(2);
+  const getMinutesCompleted = (elapsedTime: number) => {
+    const totalMinutes = Math.floor(elapsedTime / 60);
+    const totalSeconds = Math.floor(elapsedTime % 60);
 
-  const completedSets = Math.floor(
-    (currentInterval / intervals.length) * sets.length
-  );
-  const fractionOfSetsMade = `${completedSets}/${sets.length}`;
+    const timeFormatted = `${totalMinutes}:${totalSeconds
+      .toString()
+      .padStart(2, "0")}`;
+    return timeFormatted;
+  };
+
+  const totalMinutesCompleted = getMinutesCompleted(elapsedTime);
+
+  const fractionOfSetsMade = `${currentSet}/${sets.length}`;
 
   return (
     <div className="flex flex-col items-center justify-center px-6 gap-6">
@@ -209,12 +217,12 @@ const Running: React.FC = () => {
         {/* Additional Information */}
         <div className="flex items-center justify-between gap-1 mt-4 w-full">
           <div className="flex items-start flex-col">
-            <h4 className="text-3xl">{distanceCovered.toFixed(2)}</h4>
-            <p>KM</p>
+            <h4 className="text-3xl">{distanceCovered.toFixed(1)}<span className="text-sm">KM</span></h4>
+            <p>DISTANCE</p>
           </div>
           <div className="flex items-center flex-col">
             <h4 className="text-3xl">{totalMinutesCompleted}</h4>
-            <p>MINS</p>
+            <p>TIME</p>
           </div>
           <div className="flex items-end flex-col">
             <h4 className="text-3xl">{fractionOfSetsMade}</h4>
@@ -231,7 +239,13 @@ const Running: React.FC = () => {
         >
           <GrStopFill />
         </button>
-        <button className="disabled:opacity-40" disabled={currentInterval === 0}  onClick={prevInterval}>PREV</button>
+        <button
+          className="disabled:opacity-40"
+          disabled={currentInterval === 0}
+          onClick={prevInterval}
+        >
+          PREV
+        </button>
         {!isRunning && (
           <button
             className="bg-orange border border-black rounded-full w-[80px] h-[80px] flex items-center justify-center"
@@ -248,7 +262,13 @@ const Running: React.FC = () => {
             <RiPauseLargeFill size="40" />
           </button>
         )}
-        <button disabled={currentInterval >= intervals.length - 1} className="disabled:opacity-40" onClick={nextInterval}>NEXT</button>
+        <button
+          disabled={currentInterval >= intervals.length - 1}
+          className="disabled:opacity-40"
+          onClick={nextInterval}
+        >
+          NEXT
+        </button>
         <button
           className="border border-black rounded-full w-10 h-10 flex items-center justify-center"
           onClick={() => setIsRunning(false)}

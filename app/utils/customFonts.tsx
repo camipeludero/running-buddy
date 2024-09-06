@@ -14,6 +14,7 @@ const NeueMetana = localFont({
       },
     ],
     variable: "--font-neue-metana",
+    display: "swap",
   });
   
   export { NeueMetana };

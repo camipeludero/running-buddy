@@ -12,7 +12,7 @@ export const workouts: Workout[] = [
         name: "Intro",
         steps: [
           { duration: 60, speed: 4.8, legend: "Walk" },
-          { duration: 120, speed: 7.2, legend: "Soft Run" },
+          { duration: 60, speed: 7.2, legend: "Soft Run" },
         ],
       },
       {
@@ -76,114 +76,6 @@ export const workouts: Workout[] = [
           { duration: 60, speed: 4.8, legend: "Rest" },
           { duration: 60, speed: 7.2, legend: "Soft Run" },
           { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 60, speed: 4.0, legend: "Walk" },
-        ],
-      },
-    ],
-  },
-  {
-    name: "30 min HIIT",
-    category: "running",
-    type: "hiit",
-    duration: 30,
-    level: 2,
-    sets: [
-      {
-        name: "Intro",
-        steps: [
-          { duration: 60, speed: 4.0, legend: "Walk" },
-          { duration: 180, speed: 8.0, legend: "Soft Run" },
-        ],
-      },
-      {
-        name: "HIIT",
-        steps: [
-          { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 60, speed: 8.0, legend: "Run" },
-          { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 60, speed: 8.2, legend: "Run" },
-          { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 60, speed: 8.4, legend: "Run" },
-          { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 60, speed: 8.6, legend: "Run" },
-          { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 60, speed: 8.8, legend: "Run" },
-          { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 60, speed: 9.0, legend: "Run" },
-          { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 60, speed: 9.2, legend: "Run" },
-          { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 60, speed: 9.4, legend: "Run" },
-        ],
-      },
-      {
-        name: "Endurance",
-        steps: [
-          { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 180, speed: 8.0, legend: "Run" },
-          { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 180, speed: 8.0, legend: "Run" },
-        ],
-      },
-      {
-        name: "Cool Down",
-        steps: [
-          { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 60, speed: 7.0, legend: "Run" },
-          { duration: 60, speed: 4.0, legend: "Walk" },
-        ],
-      },
-    ],
-  },
-  {
-    name: "30 min HIIT",
-    category: "running",
-    type: "hiit",
-    duration: 30,
-    level: 2,
-    sets: [
-      {
-        name: "Intro",
-        steps: [
-          { duration: 60, speed: 4.0, legend: "Walk" },
-          { duration: 180, speed: 8.0, legend: "Soft Run" },
-        ],
-      },
-      {
-        name: "HIIT",
-        steps: [
-          { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 60, speed: 8.0, legend: "Run" },
-          { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 60, speed: 8.2, legend: "Run" },
-          { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 60, speed: 8.4, legend: "Run" },
-          { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 60, speed: 8.6, legend: "Run" },
-          { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 60, speed: 8.8, legend: "Run" },
-          { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 60, speed: 9.0, legend: "Run" },
-          { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 60, speed: 9.2, legend: "Run" },
-          { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 60, speed: 9.4, legend: "Run" },
-        ],
-      },
-      {
-        name: "Endurance",
-        steps: [
-          { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 180, speed: 8.0, legend: "Run" },
-          { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 180, speed: 8.0, legend: "Run" },
-        ],
-      },
-      {
-        name: "Cool Down",
-        steps: [
-          { duration: 60, speed: 4.8, legend: "Rest" },
-          { duration: 60, speed: 7.0, legend: "Run" },
           { duration: 60, speed: 4.0, legend: "Walk" },
         ],
       },
