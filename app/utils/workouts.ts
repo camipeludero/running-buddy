@@ -11,7 +11,7 @@ export const workouts: Workout[] = [
       {
         name: "Intro",
         steps: [
-          { duration: 60, speed: 4.8, legend: "Walk" },
+          { duration: 60, speed: 4, legend: "Walk" },
           { duration: 60, speed: 7.2, legend: "Soft Run" },
         ],
       },
@@ -75,6 +75,67 @@ export const workouts: Workout[] = [
         steps: [
           { duration: 60, speed: 4.8, legend: "Rest" },
           { duration: 60, speed: 7.2, legend: "Soft Run" },
+          { duration: 60, speed: 4.8, legend: "Rest" },
+          { duration: 60, speed: 4.0, legend: "Walk" },
+        ],
+      },
+    ],
+  },
+  {
+    name: "45 min Progression Run",
+    category: "running",
+    type: "hiit",
+    duration: 45,
+    level: 4,
+    sets: [
+      {
+        name: "Intro",
+        steps: [
+          { duration: 60, speed: 4.8, legend: "Walk" },
+          { duration: 120, speed: 7.2, legend: "Soft Run" },
+          { duration: 60, speed: 4.8, legend: "Rest" },
+        ],
+      },
+      {
+        name: "Progression 1",
+        steps: [
+          { duration: 120, speed: 7.2, legend: "Soft Run" },
+          { duration: 120, speed: 8, legend: "Run" },
+          { duration: 120, speed: 8.9, legend: "Run" },
+          { duration: 120, speed: 9.7, legend: "Fast Run" },
+          { duration: 120, speed: 10.5, legend: "Fast Run" },
+          { duration: 120, speed: 11.3, legend: "Fast Run" },
+          { duration: 60, speed: 4.8, legend: "Rest" },
+        ],
+      },
+      {
+        name: "Progression 2",
+        steps: [
+          { duration: 120, speed: 7.2, legend: "Soft Run" },
+          { duration: 120, speed: 8, legend: "Run" },
+          { duration: 120, speed: 8.9, legend: "Run" },
+          { duration: 120, speed: 9.7, legend: "Fast Run" },
+          { duration: 120, speed: 10.5, legend: "Fast Run" },
+          { duration: 120, speed: 11.3, legend: "Fast Run" },
+          { duration: 60, speed: 4.8, legend: "Rest" },
+        ],
+      },
+      {
+        name: "Progression 3",
+        steps: [
+          { duration: 120, speed: 7.2, legend: "Soft Run" },
+          { duration: 120, speed: 8, legend: "Run" },
+          { duration: 120, speed: 8.9, legend: "Run" },
+          { duration: 120, speed: 9.7, legend: "Fast Run" },
+          { duration: 120, speed: 10.5, legend: "Fast Run" },
+          { duration: 120, speed: 11.3, legend: "Fast Run" },
+          { duration: 60, speed: 4.8, legend: "Rest" },
+        ],
+      },
+      {
+        name: "Cool Down",
+        steps: [
+          { duration: 120, speed: 7.2, legend: "Soft Run" },
           { duration: 60, speed: 4.8, legend: "Rest" },
           { duration: 60, speed: 4.0, legend: "Walk" },
         ],

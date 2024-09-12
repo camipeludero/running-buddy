@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import {  Set, Step } from "../../types";
+import { Set, Step } from "../../types";
 import useSound from "use-sound";
 import { FaChevronLeft } from "react-icons/fa";
 import { useWorkoutStore } from "@/app/store/useWorkoutStore";
@@ -38,10 +38,12 @@ const Running: React.FC = () => {
   }, [currentInterval, sets]);
 
   useEffect(() => {
-    setDistanceCovered(
-      intervals[currentInterval].speed *
-        ((intervals[currentInterval].duration - timeLeft) / 3600)
-    );
+    if (isRunning && timeLeft > 0) {
+      setDistanceCovered((prevDistance) => {
+        const currentSpeed = intervals[currentInterval].speed / 3600;
+        return prevDistance + currentSpeed;
+      });
+    }
   }, [timeLeft]);
 
   useEffect(() => {
@@ -50,14 +52,14 @@ const Running: React.FC = () => {
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
         if (prevTime <= 1 && currentInterval === intervals.length - 1) {
-          play();
+          play()
           setIsRunning(false);
           clearInterval(timer);
           return 0;
         }
 
         if (prevTime <= 1) {
-          play();
+          play()
 
           const nextInterval = currentInterval + 1;
           setCurrentInterval(nextInterval);
@@ -216,7 +218,10 @@ const Running: React.FC = () => {
         {/* Additional Information */}
         <div className="flex items-center justify-between gap-1 mt-4 w-full">
           <div className="flex items-start flex-col">
-            <h4 className="text-3xl">{distanceCovered.toFixed(1)}<span className="text-sm">KM</span></h4>
+            <h4 className="text-3xl">
+              {distanceCovered.toFixed(1)}
+              <span className="text-sm">KM</span>
+            </h4>
             <p>DISTANCE</p>
           </div>
           <div className="flex items-center flex-col">
