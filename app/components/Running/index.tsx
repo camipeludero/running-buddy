@@ -1,25 +1,28 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Set, Step } from "../../types";
 import useSound from "use-sound";
 import { FaChevronLeft } from "react-icons/fa";
-import { useWorkoutStore } from "@/app/store/useWorkoutStore";
 import { RiPauseLargeFill } from "react-icons/ri";
 import { IoMdPlay } from "react-icons/io";
 import { GrStopFill } from "react-icons/gr";
 import { MdOutlinePlaylistPlay } from "react-icons/md";
+import { Set, Step, Workout } from "../../types";
+import Link from "next/link";
 
-const Running: React.FC = () => {
-  const { selectedWorkout, setSelectedWorkout } = useWorkoutStore();
+interface RunningProps {
+  workout: Workout; // Define the prop type
+}
 
-  const sets: Set[] = selectedWorkout?.sets || [];
+const Running: React.FC<RunningProps> = ({ workout }) => {
+
+  const sets: Set[] = workout?.sets || [];
   const intervals: Step[] = sets.flatMap((set) => set.steps);
 
   const totalDuration = intervals.reduce((sum, step) => sum + step.duration, 0);
 
   const [currentSet, setCurrentSet] = useState(0);
   const [currentInterval, setCurrentInterval] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(intervals[0].duration);
+  const [timeLeft, setTimeLeft] = useState(intervals[0]?.duration);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [play] = useSound("/sounds/alert.mp3");
@@ -52,14 +55,14 @@ const Running: React.FC = () => {
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
         if (prevTime <= 1 && currentInterval === intervals.length - 1) {
-          play()
+          play();
           setIsRunning(false);
           clearInterval(timer);
           return 0;
         }
 
         if (prevTime <= 1) {
-          play()
+          play();
 
           const nextInterval = currentInterval + 1;
           setCurrentInterval(nextInterval);
@@ -135,14 +138,18 @@ const Running: React.FC = () => {
 
   const fractionOfSetsMade = `${currentSet}/${sets.length}`;
 
+  if (!workout) {
+    return <div>Error loading workout</div>;
+  }
+
   return (
     <div className="flex flex-col items-center justify-center px-6 gap-6">
       <div className="flex items-center justify-between w-full">
-        <button onClick={() => setSelectedWorkout(null)}>
+        <Link href="/">
           <FaChevronLeft />
-        </button>
+        </Link>
         <h4 className="w-full text-center uppercase font-normal">
-          {selectedWorkout?.name}
+          {workout?.name}
         </h4>
       </div>
       <div className="w-full flex items-center gap-3 justify-between">
