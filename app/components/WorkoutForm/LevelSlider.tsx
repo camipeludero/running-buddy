@@ -5,7 +5,7 @@ import { LEVELS } from "@/app/utils/constants";
 export default function LevelSlider() {
   const { level, setLevel } = useWorkoutStore();
 
-  const handleLevelChange = (e) => {
+  const handleLevelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLevel(Number(e.target.value));
   };
 

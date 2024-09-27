@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Input from "../Basic/Input";
 import SetForm from "./SetForm";
 import CategorySelect from "./CategorySelect";
@@ -10,18 +10,20 @@ import { useFormState } from "react-dom";
 import { addWorkout, Status } from "@/lib/actions";
 
 export default function WorkoutForm() {
-  const formRef = useRef(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
   const initialToastId = "" as Id;
-  const initialState = { type: "default", toastId: initialToastId } as Status;
+  const initialState: Status = { type: "default", toastId: initialToastId };
+
   const [state, formAction] = useFormState(addWorkout, initialState);
+
   const { sets, totalDuration, calculateTotalDuration } = useWorkoutStore();
+  const [workoutName, setWorkoutName] = useState<string>("");
 
   useEffect(() => {
     calculateTotalDuration();
-  }, [sets]);
+  }, [sets, calculateTotalDuration]);
 
   const handleSubmitForm = (formData: FormData) => {
-    console.log("state", state);
     state.toastId = toast.loading("Loading...");
     formAction(formData);
   };
@@ -45,20 +47,28 @@ export default function WorkoutForm() {
       });
     }
     formRef.current?.reset();
-
-    state.type = initialState.type;
-  }, [initialState.type, state]);
+  }, [state]);
 
   const jsonSets = JSON.stringify(sets);
 
   return (
     <form
       ref={formRef}
-      action={handleSubmitForm}
+      onSubmit={(e) => {
+        e.preventDefault();
+        const formData = new FormData(formRef.current!);
+        handleSubmitForm(formData);
+      }}
       className="flex flex-col w-full gap-3"
     >
       <h4>Add a workout name</h4>
-      <Input type="text" name="name" placeholder="Workout Name" />
+      <Input
+        type="text"
+        name="name"
+        placeholder="Workout Name"
+        value={workoutName}
+        onChange={(e) => setWorkoutName(e.target.value)}
+      />
       <CategorySelect />
       <LevelSlider />
       <SetForm />

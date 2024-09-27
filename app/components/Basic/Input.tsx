@@ -2,10 +2,10 @@ import React from "react";
 import { v4 as uuidv4 } from "uuid";
 
 interface InputProps {
-  type: string;
+  type?: string;
   name: string;
-  placeholder: string;
-  value: string;
+  placeholder?: string;
+  value: string | number;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   prefix?: React.ReactNode;
   suffix?: React.ReactNode;
@@ -15,7 +15,7 @@ interface InputProps {
 }
 
 export default function Input({
-  type,
+  type = 'text',
   id,
   name,
   placeholder,

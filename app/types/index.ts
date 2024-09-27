@@ -10,10 +10,16 @@ export interface Set {
 }
 
 export interface Workout {
+  id: string;
   name: string;
   category: string;
   type: string;
   duration: number;
   level: number;
   sets: Set[];
+}
+
+export interface Category {
+  id: string;
+  name: string
 }

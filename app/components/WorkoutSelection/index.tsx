@@ -1,13 +1,10 @@
 "use client";
 import React from "react";
-import Running from "../Running"; // Assuming Running is in the same folder
 import { BsBarChartFill } from "react-icons/bs";
 import { MdTimer } from "react-icons/md";
 import { getLevel } from "../../utils";
-import { useWorkoutStore } from "@/app/store/useWorkoutStore";
 import Link from "next/link";
 
-// Define the type for workouts
 type Workout = {
   id: string;
   name: string;

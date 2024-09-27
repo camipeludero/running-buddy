@@ -1,10 +1,16 @@
 import { HiMinus, HiPlus } from "react-icons/hi";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "react-beautiful-dnd";
 import { useWorkoutStore } from "@/app/store/useWorkoutStore";
 import Input from "../Basic/Input";
 import { IoCopyOutline } from "react-icons/io5";
+import { Step } from "@/app/types";
 
-export default function StepForm({ setIndex }) {
+export default function StepForm({ setIndex }: { setIndex: number }) {
   const { sets, setSets } = useWorkoutStore();
 
   const addStep = () => {
@@ -28,18 +34,18 @@ export default function StepForm({ setIndex }) {
     setSets(updatedSets);
   };
 
-  const handleStepChange = (
+  const handleStepChange = <T extends keyof Step>(
     setIndex: number,
     stepIndex: number,
-    field: string,
-    value: string | number
+    field: T,
+    value: Step[T]
   ) => {
     const updatedSets = [...sets];
     updatedSets[setIndex].steps[stepIndex][field] = value;
     setSets(updatedSets);
   };
 
-  const handleStepReorder = (result) => {
+  const handleStepReorder = (result: DropResult) => {
     if (!result.destination) return;
     const updatedSets = [...sets];
     const steps = Array.from(updatedSets[setIndex].steps);
@@ -54,7 +60,11 @@ export default function StepForm({ setIndex }) {
       <DragDropContext onDragEnd={handleStepReorder}>
         <Droppable droppableId={`steps-${setIndex}`}>
           {(provided) => (
-            <div className="flex flex-col gap-6" ref={provided.innerRef} {...provided.droppableProps}>
+            <div
+              className="flex flex-col gap-6"
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+            >
               {sets[setIndex].steps.map((step, stepIndex) => (
                 <Draggable
                   key={stepIndex}
@@ -81,9 +91,10 @@ export default function StepForm({ setIndex }) {
                         }}
                       />
                       <Input
+                        name="duration"
                         type="number"
                         placeholder="Duration"
-                        value={step.duration}
+                        value={Number(step.duration)}
                         onChange={(e) =>
                           handleStepChange(
                             setIndex,
@@ -96,9 +107,10 @@ export default function StepForm({ setIndex }) {
                         suffix="s"
                       />
                       <Input
+                        name="speed"
                         type="number"
                         placeholder="Speed"
-                        value={step.speed}
+                        value={Number(step.speed)}
                         onChange={(e) =>
                           handleStepChange(
                             setIndex,

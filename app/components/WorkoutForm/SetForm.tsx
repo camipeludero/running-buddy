@@ -1,5 +1,10 @@
-import { HiClipboardCopy, HiMinus, HiPlus } from "react-icons/hi";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { HiMinus } from "react-icons/hi";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "react-beautiful-dnd";
 import { useWorkoutStore } from "@/app/store/useWorkoutStore";
 import StepForm from "./StepForm";
 import Input from "../Basic/Input";
@@ -13,16 +18,6 @@ export default function SetForm() {
       ...sets,
       { name: "", steps: [{ duration: 0, speed: 0, legend: "" }] },
     ]);
-  };
-
-  const handleSetChange = (
-    index: number,
-    field: string,
-    value: string | number
-  ) => {
-    const updatedSets = [...sets];
-    updatedSets[index][field] = value;
-    setSets(updatedSets);
   };
 
   const duplicateSet = (index: number) => {
@@ -39,7 +34,7 @@ export default function SetForm() {
     setSets(updatedSets);
   };
 
-  const handleSetReorder = (result) => {
+  const handleSetReorder = (result: DropResult) => {
     if (!result.destination) return;
     const updatedSets = Array.from(sets);
     const [reorderedSet] = updatedSets.splice(result.source.index, 1);
@@ -54,15 +49,19 @@ export default function SetForm() {
       </div>
       <DragDropContext onDragEnd={handleSetReorder}>
         <Droppable droppableId="sets">
-          {(provided) => (
-            <div className="flex flex-col gap-6" ref={provided.innerRef} {...provided.droppableProps}>
+          {(provided: any) => (
+            <div
+              className="flex flex-col gap-6"
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+            >
               {sets.map((set, setIndex) => (
                 <Draggable
                   key={setIndex}
                   draggableId={`set-${setIndex}`}
                   index={setIndex}
                 >
-                  {(provided) => (
+                  {(provided: any) => (
                     <div
                       className="relative border border-black rounded-md p-4 bg-white flex flex-col gap-3"
                       ref={provided.innerRef}

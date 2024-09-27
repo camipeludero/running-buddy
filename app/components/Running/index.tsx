@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import useSound from "use-sound";
 import { FaChevronLeft } from "react-icons/fa";
 import { RiPauseLargeFill } from "react-icons/ri";
@@ -15,7 +15,7 @@ interface RunningProps {
 
 const Running: React.FC<RunningProps> = ({ workout }) => {
 
-  const sets: Set[] = workout?.sets || [];
+  const sets: Set[] = useMemo(() => workout?.sets || [], [workout]);
   const intervals: Step[] = sets.flatMap((set) => set.steps);
 
   const totalDuration = intervals.reduce((sum, step) => sum + step.duration, 0);
