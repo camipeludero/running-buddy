@@ -1,6 +1,4 @@
-import { Workout } from "../types";
-
-export const workouts: Workout[] = [
+export const workouts = [
   {
     name: "45 min HIIT",
     category: "running",

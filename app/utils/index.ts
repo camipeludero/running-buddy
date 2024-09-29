@@ -1,11 +1,5 @@
-const LEVELS: { [key: number]: string } = {
-    1: 'Easy',
-    2: 'Medium',
-    3: 'Can survive',
-    4: 'Hard',
-    5: 'Hell'
-};
+import { LEVELS } from "./constants";
 
 export const getLevel = (n: number) => {
-    return LEVELS[n];
+  return LEVELS[n];
 };

@@ -27,3 +27,20 @@ h5{
 h2 {
   @apply text-3xl text-orange;
 }
+
+input[type="range"]::-webkit-slider-thumb {
+  @apply appearance-none bg-orange w-5 h-5 border border-black rounded-full cursor-pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(0.97);
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
+  transform: scale(0.92);
+}
+
+.button-primary{
+  @apply bg-orange rounded-md border border-black text-black py-3 px-6 uppercase font-bold text-lg text-center flex items-center justify-center; 
+}

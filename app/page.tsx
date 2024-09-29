@@ -1,10 +1,16 @@
-import WorkoutSelection from "./components/WorkoutSelection";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+import WorkoutSelection from "./components/WorkoutSelection"; // Client component for rendering
+import { Database } from "./types/supabase";
 
-export default function Home() {
+export default async function WorkoutPage() {
+  const supabase = createServerComponentClient<Database>({ cookies });
+  const { data: workouts, error } = await supabase.from("workouts").select("*");
 
-  return (
-    <div className="py-16">
-    <WorkoutSelection />
-  </div>
-  );
+  if (error) {
+    console.error("Error fetching workouts:", error);
+    return <div>Error loading workouts</div>;
+  }
+
+  return <WorkoutSelection workouts={workouts} />;
 }
