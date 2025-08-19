@@ -5,29 +5,55 @@ import { FaChevronLeft } from "react-icons/fa";
 import { RiPauseLargeFill } from "react-icons/ri";
 import { IoMdPlay } from "react-icons/io";
 import { GrStopFill } from "react-icons/gr";
-import { MdOutlinePlaylistPlay } from "react-icons/md";
+import { MdOutlinePlaylistPlay, MdSkipPrevious, MdSkipNext, MdDirectionsRun, MdTimer, MdSpeed } from "react-icons/md";
 import { Set, Step, Workout } from "../../types";
 import Link from "next/link";
+import WorkoutStepsModal from "./WorkoutStepsModal";
 
 interface RunningProps {
   workout: Workout; // Define the prop type
 }
 
 const Running: React.FC<RunningProps> = ({ workout }) => {
+  console.log('Running component received workout:', workout);
 
-  const sets: Set[] = useMemo(() => workout?.sets || [], [workout]);
-  const intervals: Step[] = sets.flatMap((set) => set.steps);
+  const sets: Set[] = useMemo(() => {
+    if (!workout?.sets) return [];
+    
+    // Handle both JSON string and already parsed object
+    let parsedSets: Set[] = [];
+    if (typeof workout.sets === 'string') {
+      try {
+        parsedSets = JSON.parse(workout.sets) as Set[];
+      } catch (error) {
+        console.error('Error parsing sets JSON:', error);
+        return [];
+      }
+    } else {
+      parsedSets = workout.sets;
+    }
+    
+    console.log('Parsed sets:', parsedSets);
+    return parsedSets || [];
+  }, [workout]);
 
-  const totalDuration = intervals.reduce((sum, step) => sum + step.duration, 0);
+  const intervals: Step[] = useMemo(() => {
+    const flatIntervals = sets.flatMap((set) => set.steps);
+    console.log('Flattened intervals:', flatIntervals);
+    return flatIntervals;
+  }, [sets]);
+
+  const totalDuration = intervals.reduce((sum, step) => sum + (step.duration || 0), 0);
 
   const [currentSet, setCurrentSet] = useState(0);
   const [currentInterval, setCurrentInterval] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(intervals[0]?.duration);
+  const [timeLeft, setTimeLeft] = useState(intervals[0]?.duration || 0);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [play] = useSound("/sounds/alert.mp3");
 
   const [distanceCovered, setDistanceCovered] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     let cumulativeSteps = 0;
@@ -40,24 +66,30 @@ const Running: React.FC<RunningProps> = ({ workout }) => {
     }
   }, [currentInterval, sets]);
 
+  // Reset timeLeft when intervals change or component mounts
   useEffect(() => {
-    if (isRunning && timeLeft > 0) {
+    if (intervals.length > 0 && intervals[currentInterval]) {
+      setTimeLeft(intervals[currentInterval].duration || 0);
+    }
+  }, [intervals, currentInterval]);
+
+  useEffect(() => {
+    if (isRunning && timeLeft > 0 && intervals[currentInterval]) {
       setDistanceCovered((prevDistance) => {
-        const currentSpeed = intervals[currentInterval].speed / 3600;
+        const currentSpeed = (intervals[currentInterval].speed || 0) / 3600;
         return prevDistance + currentSpeed;
       });
     }
-  }, [timeLeft]);
+  }, [timeLeft, isRunning, currentInterval, intervals]);
 
   useEffect(() => {
-    if (!isRunning) return;
+    if (!isRunning || intervals.length === 0) return;
 
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
         if (prevTime <= 1 && currentInterval === intervals.length - 1) {
           play();
           setIsRunning(false);
-          clearInterval(timer);
           return 0;
         }
 
@@ -65,8 +97,11 @@ const Running: React.FC<RunningProps> = ({ workout }) => {
           play();
 
           const nextInterval = currentInterval + 1;
-          setCurrentInterval(nextInterval);
-          return intervals[nextInterval].duration;
+          if (nextInterval < intervals.length && intervals[nextInterval]) {
+            setCurrentInterval(nextInterval);
+            return intervals[nextInterval].duration || 0;
+          }
+          return 0;
         }
         return prevTime - 1;
       });
@@ -75,45 +110,68 @@ const Running: React.FC<RunningProps> = ({ workout }) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [currentInterval, isRunning]);
+  }, [currentInterval, isRunning, intervals, play]);
 
   const startTimer = () => {
-    setIsRunning(true);
+    console.log('Starting timer, current interval:', currentInterval, 'intervals:', intervals);
+    if (intervals.length > 0 && intervals[currentInterval]) {
+      setIsRunning(true);
+    }
   };
 
   const stopTimer = () => {
+    console.log('Stopping timer');
     setIsRunning(false);
     setCurrentInterval(0);
-    setTimeLeft(intervals[0].duration);
+    setTimeLeft(intervals[0]?.duration || 0);
     setElapsedTime(0);
     setDistanceCovered(0);
     setCurrentSet(0);
   };
 
   const prevInterval = () => {
-    if (currentInterval > 0) {
+    console.log('Previous interval clicked, current:', currentInterval);
+    if (currentInterval > 0 && intervals[currentInterval - 1]) {
       const previousInterval = currentInterval - 1;
       setCurrentInterval(previousInterval);
-      setTimeLeft(intervals[previousInterval].duration);
+      setTimeLeft(intervals[previousInterval].duration || 0);
+      setIsRunning(false);
     }
   };
 
   const nextInterval = () => {
-    if (currentInterval < intervals.length - 1) {
+    console.log('Next interval clicked, current:', currentInterval, 'total:', intervals.length);
+    if (currentInterval < intervals.length - 1 && intervals[currentInterval + 1]) {
       const nextInterval = currentInterval + 1;
       setCurrentInterval(nextInterval);
-      setTimeLeft(intervals[nextInterval].duration);
+      setTimeLeft(intervals[nextInterval].duration || 0);
+      setIsRunning(false);
     }
   };
 
-  const progressPercentage = (elapsedTime / totalDuration) * 100;
+  const jumpToInterval = (intervalIndex: number) => {
+    console.log('Jumping to interval:', intervalIndex);
+    if (intervalIndex >= 0 && intervalIndex < intervals.length && intervals[intervalIndex]) {
+      setCurrentInterval(intervalIndex);
+      setTimeLeft(intervals[intervalIndex].duration || 0);
+      setIsRunning(false);
+    }
+  };
 
-  const currentStepDuration = intervals[currentInterval].duration;
-  const stepProgressPercentage =
-    ((currentStepDuration - timeLeft) / currentStepDuration) * 100;
+  const openWorkoutMenu = () => {
+    console.log('Opening workout menu');
+    setIsModalOpen(true);
+  };
+
+  const progressPercentage = totalDuration > 0 ? (elapsedTime / totalDuration) * 100 : 0;
+
+  const currentStepDuration = intervals[currentInterval]?.duration || 0;
+  const stepProgressPercentage = currentStepDuration > 0 
+    ? ((currentStepDuration - timeLeft) / currentStepDuration) * 100 
+    : 0;
 
   const nextLegend =
-    currentInterval < intervals.length - 1
+    currentInterval < intervals.length - 1 && intervals[currentInterval + 1]
       ? `${intervals[currentInterval + 1].legend} - ${
           intervals[currentInterval + 1].speed
         }KPH`
@@ -138,155 +196,251 @@ const Running: React.FC<RunningProps> = ({ workout }) => {
 
   const fractionOfSetsMade = `${currentSet}/${sets.length}`;
 
+  // Safety check for empty intervals
+  if (intervals.length === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-screen px-4">
+        <div className="card text-center space-y-4 max-w-md">
+          <h3 className="text-xl font-semibold text-red-400">Invalid Workout Data</h3>
+          <p className="text-gray-400">
+            This workout has no intervals or steps configured.
+          </p>
+          <Link href="/" className="button-primary">
+            Back to Workouts
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   if (!workout) {
-    return <div>Error loading workout</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="card text-center space-y-4">
+          <h3 className="text-xl font-semibold text-dark-100">Error loading workout</h3>
+          <p className="text-dark-400">Please try again or select a different workout</p>
+          <Link href="/" className="button-primary inline-block">
+            Back to Workouts
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="flex flex-col items-center justify-center px-6 gap-6">
-      <div className="flex items-center justify-between w-full">
-        <Link href="/">
-          <FaChevronLeft />
-        </Link>
-        <h4 className="w-full text-center uppercase font-normal">
-          {workout?.name}
-        </h4>
-      </div>
-      <div className="w-full flex items-center gap-3 justify-between">
-        <div className="w-full h-2 border border-black rounded-full">
-          <div
-            className="bg-orange border border-black h-full"
-            style={{
-              width: `${progressPercentage}%`,
-              transition: "width 0.5s ease",
-            }}
-          ></div>
-        </div>
-        <h5>{progressPercentage.toFixed(0)}%</h5>
-      </div>
-      <div className="flex items-center justify-center text-center flex-col gap-3">
-        <div
-          className="relative"
-          style={{ width: "min(80vw, 400px)", height: "min(80vw, 400px)" }}
+    <div className="min-h-screen px-4 py-6 space-y-4 sm:space-y-6 animate-fade-in max-w-md mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-2">
+        <Link 
+          href="/" 
+          className="p-2 sm:p-3 rounded-xl bg-dark-700 hover:bg-dark-600 text-dark-200 hover:text-white transition-all duration-200 transform hover:scale-105 active:scale-95"
         >
-          {/* Circular Progress Bar */}
-          <svg
-            width="100%"
-            height="100%"
-            viewBox="0 0 120 120" // Set the viewBox to match the original size
-          >
-            {/* Background circle (border) */}
-            <circle
-              cx="60"
-              cy="60"
-              r={radius}
-              fill="none"
-              stroke="#000"
-              strokeWidth="6"
-            />
-            <circle
-              cx="60"
-              cy="60"
-              r={radius}
-              fill="none"
-              stroke="#F6F5E9"
-              strokeWidth="5"
-            />
-            {/* Progress circle (orange) */}
-            <circle
-              cx="60"
-              cy="60"
-              r={radius}
-              fill="none"
-              stroke="#F58E12"
-              strokeWidth="5"
-              strokeDasharray={circumference}
-              strokeDashoffset={strokeDashoffset}
-              transform="rotate(-90 60 60)" // Rotate 90 degrees counterclockwise
-              style={{ transition: "stroke-dashoffset 1s linear" }}
-            />
-          </svg>
-          <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 text-center">
-            <h1 className="text-5xl">
-              {Math.floor(timeLeft / 60)}:
-              {(timeLeft % 60).toString().padStart(2, "0")}
-            </h1>
-            <h4 className="font-bold text-2xl mt-8">
-              {intervals[currentInterval].speed}KPH
-            </h4>
-            <p className="uppercase">{intervals[currentInterval].legend}</p>
-          </div>
+          <FaChevronLeft className="text-base sm:text-lg" />
+        </Link>
+        <div className="text-center flex-1 mx-4">
+          <h1 className="text-lg sm:text-xl font-bold text-dark-100 uppercase tracking-wide truncate">
+            {workout?.name}
+          </h1>
+          <p className="text-dark-400 text-xs sm:text-sm">Workout in Progress</p>
         </div>
-        <p className="uppercase">
-          {nextLegend === "Finished"
-            ? "Workout Completed!"
-            : `Next: ${nextLegend}`}
-        </p>
-        {/* Additional Information */}
-        <div className="flex items-center justify-between gap-1 mt-4 w-full">
-          <div className="flex items-start flex-col">
-            <h4 className="text-3xl">
-              {distanceCovered.toFixed(1)}
-              <span className="text-sm">KM</span>
-            </h4>
-            <p>DISTANCE</p>
-          </div>
-          <div className="flex items-center flex-col">
-            <h4 className="text-3xl">{totalMinutesCompleted}</h4>
-            <p>TIME</p>
-          </div>
-          <div className="flex items-end flex-col">
-            <h4 className="text-3xl">{fractionOfSetsMade}</h4>
-            <p>SETS</p>
-          </div>
+        <div className="w-8 sm:w-12"></div> {/* Spacer for center alignment */}
+      </div>
+
+      {/* Overall Progress Bar */}
+      <div className="card space-y-3 p-4">
+        <div className="flex items-center justify-between">
+          <span className="text-xs sm:text-sm font-medium text-dark-200">Overall Progress</span>
+          <span className="text-xs sm:text-sm font-bold text-accent-primary">{progressPercentage.toFixed(0)}%</span>
+        </div>
+        <div className="w-full h-2 sm:h-3 bg-dark-600 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-accent-primary to-accent-secondary transition-all duration-500 ease-out"
+            style={{ width: `${progressPercentage}%` }}
+          ></div>
         </div>
       </div>
 
-      {/* Buttons */}
-      <div className="flex items-center justify-center gap-8 px-6">
-        <button
-          className="border border-black rounded-full w-10 h-10 flex items-center justify-center"
-          onClick={stopTimer}
+      {/* Main Timer Circle */}
+      <div className="flex flex-col items-center space-y-4 sm:space-y-6">
+        <div
+          className="relative flex items-center justify-center mx-auto"
+          style={{ width: "min(75vw, 280px)", height: "min(75vw, 280px)" }}
         >
-          <GrStopFill />
-        </button>
-        <button
-          className="disabled:opacity-40"
-          disabled={currentInterval === 0}
-          onClick={prevInterval}
-        >
-          PREV
-        </button>
-        {!isRunning && (
-          <button
-            className="bg-orange border border-black rounded-full w-[80px] h-[80px] flex items-center justify-center"
-            onClick={startTimer}
+          {/* Circular Progress Ring */}
+          <svg
+            width="100%"
+            height="100%"
+            viewBox="0 0 120 120"
+            className="transform -rotate-90"
           >
-            <IoMdPlay size="40" />
-          </button>
-        )}
-        {isRunning && (
-          <button
-            className="bg-orange border border-black rounded-full w-[80px] h-[80px] flex items-center justify-center"
-            onClick={() => setIsRunning(false)}
-          >
-            <RiPauseLargeFill size="40" />
-          </button>
-        )}
-        <button
-          disabled={currentInterval >= intervals.length - 1}
-          className="disabled:opacity-40"
-          onClick={nextInterval}
-        >
-          NEXT
-        </button>
-        <button
-          className="border border-black rounded-full w-10 h-10 flex items-center justify-center"
-          onClick={() => setIsRunning(false)}
-        >
-          <MdOutlinePlaylistPlay />
-        </button>
+            {/* Background circle */}
+            <circle
+              cx="60"
+              cy="60"
+              r={radius}
+              fill="none"
+              stroke="rgb(42, 42, 42)"
+              strokeWidth="6"
+            />
+            {/* Progress circle */}
+            <circle
+              cx="60"
+              cy="60"
+              r={radius}
+              fill="none"
+              stroke="url(#gradient)"
+              strokeWidth="6"
+              strokeDasharray={circumference}
+              strokeDashoffset={strokeDashoffset}
+              strokeLinecap="round"
+              style={{ transition: "stroke-dashoffset 1s linear" }}
+            />
+            {/* Gradient definition */}
+            <defs>
+              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="rgb(99, 102, 241)" />
+                <stop offset="100%" stopColor="rgb(139, 92, 246)" />
+              </linearGradient>
+            </defs>
+          </svg>
+          
+          {/* Timer Content */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center space-y-1 sm:space-y-2 px-4">
+            <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-dark-100 tabular-nums">
+              {Math.floor(timeLeft / 60)}:
+              {(timeLeft % 60).toString().padStart(2, "0")}
+            </div>
+            <div className="flex items-center gap-1 sm:gap-2 bg-accent-primary/20 px-2 sm:px-3 py-1 sm:py-2 rounded-lg border border-accent-primary/30">
+              <MdSpeed className="text-accent-primary text-sm sm:text-base" />
+              <span className="text-sm sm:text-base font-bold text-accent-primary">
+                {intervals[currentInterval]?.speed || 0}KPH
+              </span>
+            </div>
+            <p className="text-dark-300 uppercase tracking-wide font-medium text-xs sm:text-sm text-center leading-tight">
+              {intervals[currentInterval]?.legend || "No data"}
+            </p>
+          </div>
+        </div>
+
+        {/* Next Interval Preview */}
+        <div className="text-center space-y-1 px-4">
+          <p className="text-dark-400 text-xs uppercase tracking-wide">Next</p>
+          <p className="text-dark-200 font-medium text-sm text-center leading-tight">
+            {nextLegend === "Finished"
+              ? "🎉 Workout Completed!"
+              : nextLegend}
+          </p>
+        </div>
       </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+        <div className="card text-center space-y-1 sm:space-y-2 p-3 sm:p-4">
+          <div className="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 bg-accent-success/20 rounded-lg mx-auto">
+            <MdDirectionsRun className="text-accent-success text-sm sm:text-base" />
+          </div>
+          <div className="text-lg sm:text-xl font-bold text-dark-100 tabular-nums">
+            {distanceCovered.toFixed(1)}
+            <span className="text-xs text-dark-400 ml-1">KM</span>
+          </div>
+          <p className="text-xs text-dark-400 uppercase tracking-wide">Distance</p>
+        </div>
+        
+        <div className="card text-center space-y-1 sm:space-y-2 p-3 sm:p-4">
+          <div className="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 bg-accent-primary/20 rounded-lg mx-auto">
+            <MdTimer className="text-accent-primary text-sm sm:text-base" />
+          </div>
+          <div className="text-lg sm:text-xl font-bold text-dark-100 tabular-nums">
+            {totalMinutesCompleted}
+          </div>
+          <p className="text-xs text-dark-400 uppercase tracking-wide">Time</p>
+        </div>
+        
+        <div className="card text-center space-y-1 sm:space-y-2 p-3 sm:p-4">
+          <div className="flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 bg-accent-warning/20 rounded-lg mx-auto">
+            <MdOutlinePlaylistPlay className="text-accent-warning text-sm sm:text-base" />
+          </div>
+          <div className="text-lg sm:text-xl font-bold text-dark-100 tabular-nums">
+            {fractionOfSetsMade}
+          </div>
+          <p className="text-xs text-dark-400 uppercase tracking-wide">Sets</p>
+        </div>
+      </div>
+
+      {/* Control Buttons - Mobile First Design */}
+      <div className="space-y-4 pt-2">
+        {/* Main Play/Pause Button - Full Width on Mobile */}
+        <div className="flex justify-center">
+          {!isRunning ? (
+            <button
+              className="p-4 sm:p-5 rounded-full bg-gradient-to-r from-accent-primary to-accent-secondary hover:from-accent-secondary hover:to-accent-primary shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 active:scale-95"
+              onClick={startTimer}
+              title="Start workout"
+            >
+              <IoMdPlay className="text-2xl sm:text-3xl text-white ml-1" />
+            </button>
+          ) : (
+            <button
+              className="p-4 sm:p-5 rounded-full bg-gradient-to-r from-accent-primary to-accent-secondary hover:from-accent-secondary hover:to-accent-primary shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 active:scale-95"
+              onClick={() => setIsRunning(false)}
+              title="Pause workout"
+            >
+              <RiPauseLargeFill className="text-2xl sm:text-3xl text-white" />
+            </button>
+          )}
+        </div>
+
+        {/* Secondary Controls */}
+        <div className="grid grid-cols-4 gap-2 sm:gap-3">
+          {/* Stop Button */}
+          <button
+            className="p-3 sm:p-4 rounded-xl bg-accent-error/20 hover:bg-accent-error/30 border border-accent-error/30 hover:border-accent-error text-accent-error transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center"
+            onClick={stopTimer}
+            title="Stop workout"
+          >
+            <GrStopFill className="text-sm sm:text-base" />
+          </button>
+
+          {/* Previous Button */}
+          <button
+            className="p-3 sm:px-4 sm:py-3 rounded-xl bg-dark-700 hover:bg-dark-600 border border-dark-600 hover:border-accent-primary text-dark-200 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 active:scale-95 disabled:transform-none flex items-center justify-center"
+            disabled={currentInterval === 0}
+            onClick={prevInterval}
+            title="Previous interval"
+          >
+            <MdSkipPrevious className="text-sm sm:text-base" />
+          </button>
+
+          {/* Next Button */}
+          <button
+            className="p-3 sm:px-4 sm:py-3 rounded-xl bg-dark-700 hover:bg-dark-600 border border-dark-600 hover:border-accent-primary text-dark-200 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-105 active:scale-95 disabled:transform-none flex items-center justify-center"
+            disabled={currentInterval >= intervals.length - 1}
+            onClick={nextInterval}
+            title="Next interval"
+          >
+            <MdSkipNext className="text-sm sm:text-base" />
+          </button>
+
+          {/* Menu Button */}
+          <button
+            className="p-3 sm:p-4 rounded-xl bg-dark-700 hover:bg-dark-600 border border-dark-600 hover:border-accent-primary text-dark-200 hover:text-white transition-all duration-200 transform hover:scale-105 active:scale-95 flex items-center justify-center"
+            onClick={openWorkoutMenu}
+            title="View workout steps"
+          >
+            <MdOutlinePlaylistPlay className="text-sm sm:text-base" />
+          </button>
+        </div>
+      </div>
+
+      {/* Workout Steps Modal */}
+      <WorkoutStepsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        workoutName={workout?.name || "Workout"}
+        sets={sets}
+        currentInterval={currentInterval}
+        onJumpToInterval={jumpToInterval}
+      />
     </div>
   );
 };

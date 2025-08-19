@@ -32,7 +32,7 @@ export default function Input({
     return (
       <label
         htmlFor={uuid}
-        className="uppercase py-2 px-6 border border-black rounded-md w-fit bg-transparent has-[:checked]:bg-orange"
+        className="group relative cursor-pointer"
       >
         <input
           id={uuid}
@@ -40,22 +40,26 @@ export default function Input({
           name={name}
           value={value}
           onChange={onChange}
-          className={`${className} appearance-none`}
+          className={`${className} sr-only`}
         />
-        {label ? label : null}
+        <div className="flex items-center justify-center py-3 px-6 rounded-xl border-2 border-dark-600 bg-dark-700 hover:bg-dark-600 has-[:checked]:border-accent-primary has-[:checked]:bg-accent-primary/10 has-[:checked]:text-accent-primary transition-all duration-200 transform hover:scale-105 active:scale-100">
+          <span className="text-sm font-medium uppercase tracking-wider text-dark-200 group-has-[:checked]:text-accent-primary">
+            {label}
+          </span>
+        </div>
       </label>
     );
   } else {
     return (
       <div className={`relative w-full ${className}`}>
         {prefix && (
-          <span className="absolute inset-y-0 left-0 flex items-center px-3 text-gray-500">
+          <span className="absolute inset-y-0 left-0 flex items-center px-4 text-dark-400">
             {prefix}
           </span>
         )}
         <input
           id={uuid}
-          className={`border border-black bg-transparent rounded-md py-3 px-6 text-black placeholder:text-black/50 w-full ${
+          className={`input-field ${
             prefix ? "pl-12" : ""
           } ${suffix ? "pr-12" : ""}`}
           type={type}
@@ -65,7 +69,7 @@ export default function Input({
           onChange={onChange}
         />
         {suffix && (
-          <span className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+          <span className="absolute inset-y-0 right-0 flex items-center px-4 text-dark-400">
             {suffix}
           </span>
         )}

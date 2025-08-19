@@ -20,10 +20,29 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`bg-bg text-black container py-8 ${inter.variable} ${NeueMetana.variable}`}
+        className={`min-h-screen transition-colors duration-300 ${inter.variable} ${NeueMetana.variable}`}
+        style={{ 
+          background: 'linear-gradient(135deg, #0A0A0A 0%, #111111 50%, #0A0A0A 100%)',
+          minHeight: '100vh'
+        }}
       >
-        <ToastContainer />
-        {children}
+        <div className="min-h-screen">
+          <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6 lg:py-8 max-w-6xl">
+            <ToastContainer 
+              theme="dark"
+              position="top-right"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+            />
+            {children}
+          </div>
+        </div>
       </body>
     </html>
   );

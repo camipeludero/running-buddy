@@ -16,7 +16,7 @@ export interface Workout {
   type: string;
   duration: number;
   level: number;
-  sets: Set[];
+  sets?: Set[] | string; // Optional and can be JSON string from database
 }
 
 export interface Category {

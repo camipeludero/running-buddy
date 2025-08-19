@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest, NextResponse } from "next/server";
 
 const generateRandomString = (length: number): string => {
   let text = "";
@@ -11,7 +11,7 @@ const generateRandomString = (length: number): string => {
   return text;
 };
 
-const login = (req: NextApiRequest, res: NextApiResponse) => {
+export async function GET(request: NextRequest) {
   const scope: string = "streaming user-read-email user-read-private";
   const spotify_redirect_uri = "http://localhost:3000/api/auth/callback";
   const state: string = generateRandomString(16);
@@ -33,10 +33,8 @@ const login = (req: NextApiRequest, res: NextApiResponse) => {
     state: state,
   });
 
-  res.redirect(
+  return NextResponse.redirect(
     "https://accounts.spotify.com/authorize/?" +
       auth_query_parameters.toString()
   );
-};
-
-export default login;
+}

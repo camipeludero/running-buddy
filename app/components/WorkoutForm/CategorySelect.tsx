@@ -30,14 +30,17 @@ export default function CategorySelect() {
   };
 
   return (
-    <div className="flex flex-col gap-3">
-      <h4>Choose the category</h4>
-      <div className="flex items-center overflow-auto scrollbar-none gap-4">
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <h4 className="text-xl font-semibold text-dark-100">Choose the category</h4>
+        <p className="text-dark-400 text-sm">Select a category that best describes your workout</p>
+      </div>
+      <div className="flex items-center overflow-x-auto scrollbar-thin gap-4 pb-2">
         {categories.map(({ name, id }) => (
           <Input key={id} type="radio" name="category" value={name} label={name} onChange={handleCategoryChange}/>
         ))}
-        <button className="flex items-center justify-center border border-black rounded-full h-8 w-8">
-          +
+        <button className="flex items-center justify-center border-2 border-dashed border-accent-primary/50 hover:border-accent-primary rounded-xl h-12 w-12 text-accent-primary hover:bg-accent-primary/10 transition-all duration-200 transform hover:scale-105 active:scale-95 flex-shrink-0">
+          <span className="text-xl font-bold">+</span>
         </button>
       </div>
     </div>
