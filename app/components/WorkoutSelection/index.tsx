@@ -108,13 +108,10 @@ const WorkoutSelection: React.FC<WorkoutSelectionProps> = ({ workouts }) => {
     <div className="space-y-6 sm:space-y-8 animate-fade-in px-4 py-6">
       {/* Header Section */}
       <div className="text-center space-y-3 sm:space-y-4">
-        <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2 sm:mb-4">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-dark-100 flex items-center justify-center gap-2 sm:gap-3 mb-2 sm:mb-4">
           <MdFitnessCenter className="text-2xl sm:text-3xl lg:text-4xl text-accent-primary" />
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold bg-gradient-to-r from-accent-primary to-accent-secondary bg-clip-text text-transparent">
-            Running Buddy
-          </h1>
-        </div>
-        <h2 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl">Choose workout to smash today</h2>
+          Choose workout to smash today
+        </h2>
         <p className="text-dark-400 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto px-4">
           Select from our curated workouts or create your own personalized training session
         </p>

@@ -9,6 +9,7 @@ import { MdOutlinePlaylistPlay, MdSkipPrevious, MdSkipNext, MdDirectionsRun, MdT
 import { Set, Step, Workout } from "../../types";
 import Link from "next/link";
 import WorkoutStepsModal from "./WorkoutStepsModal";
+import WorkoutCompletionScreen from "./WorkoutCompletionScreen";
 
 interface RunningProps {
   workout: Workout; // Define the prop type
@@ -54,6 +55,7 @@ const Running: React.FC<RunningProps> = ({ workout }) => {
 
   const [distanceCovered, setDistanceCovered] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isWorkoutComplete, setIsWorkoutComplete] = useState(false);
 
   useEffect(() => {
     let cumulativeSteps = 0;
@@ -90,6 +92,7 @@ const Running: React.FC<RunningProps> = ({ workout }) => {
         if (prevTime <= 1 && currentInterval === intervals.length - 1) {
           play();
           setIsRunning(false);
+          setIsWorkoutComplete(true);
           return 0;
         }
 
@@ -441,6 +444,15 @@ const Running: React.FC<RunningProps> = ({ workout }) => {
         currentInterval={currentInterval}
         onJumpToInterval={jumpToInterval}
       />
+
+      {/* Workout Completion Screen */}
+      {isWorkoutComplete && (
+        <WorkoutCompletionScreen
+          workout={workout}
+          elapsedTime={elapsedTime}
+          onClose={() => setIsWorkoutComplete(false)}
+        />
+      )}
     </div>
   );
 };

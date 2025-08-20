@@ -5,6 +5,7 @@ import { NeueMetana } from "../app/utils/customFonts";
 import "./globals.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { AuthProvider } from "./context/AuthContext";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -27,21 +28,23 @@ export default function RootLayout({
         }}
       >
         <div className="min-h-screen">
-          <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6 lg:py-8 max-w-6xl">
-            <ToastContainer 
-              theme="dark"
-              position="top-right"
-              autoClose={3000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-            />
-            {children}
-          </div>
+          <AuthProvider>
+            <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6 lg:py-8 max-w-6xl">
+              <ToastContainer 
+                theme="dark"
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+              />
+              {children}
+            </div>
+          </AuthProvider>
         </div>
       </body>
     </html>
